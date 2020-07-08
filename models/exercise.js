@@ -1,22 +1,24 @@
 const mongoose = require('mongoose');
-const { User } = require('./user');
+const { ObjectId } = require('mongodb');
 
 const ExerciseSchema = new mongoose.Schema({
-    user_id: {    // insert array of references to user documents  
-        type: [User._id], 
-        required: true 
+    userId: {
+        type: ObjectId,
+        required: true
     }, 
     description: {
-        type: Text,
-        required: true
-    },
-    duration: {
         type: String,
         required: true
     },
+    duration: {
+        type: Number,
+        required: true,
+        max: 600
+    },
     date: {
+        required: true,
         type: Date,
-        default: Date.now
+        default: Date.now   
     }
 });
 

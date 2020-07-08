@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const routes = require('./routes');
+const routes = require('./routes/routes');
 require('dotenv').config();
 
 const cors = require('cors');
@@ -51,6 +51,7 @@ app.use((err, req, res, next) => {
         errCode = err.status || 500;
         errMessage = err.message || 'Internal Server Error';
     }
+    console.log(err);
     res.status(errCode).json({ error: errMessage });
 });
 
