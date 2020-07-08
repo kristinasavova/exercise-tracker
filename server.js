@@ -1,5 +1,6 @@
 const express = require('express');
 const app = express();
+const routes = require('./routes');
 require('dotenv').config();
 
 const cors = require('cors');
@@ -9,7 +10,12 @@ mongoose.connect(process.env.MLAB_URI ||
     `mongodb+srv://${process.env.MONGO_NAME}:${process.env.MONGO_KEY}@ks-ujl29.mongodb.net/exercise-tracker?retryWrites=true&w=majority`, {
         useNewUrlParser: true,
         useUnifiedTopology: true
-    });
+});
+
+const db = mongoose.connection;
+
+db.on('error', err => console.error(err));
+db.once('open', () => console.log('Database is connected'));
 
 app.use(cors());
 
@@ -21,6 +27,8 @@ app.use(express.static('public'));
 app.get('/', (req, res) => {
     res.sendFile(__dirname + '/views/index.html');
 });
+
+app.use('/api', routes);
 
 // 404 Error middleware
 app.use((req, res, next) => {
