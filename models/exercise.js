@@ -1,9 +1,8 @@
 const mongoose = require('mongoose');
-const { ObjectId } = require('mongodb');
 
 const ExerciseSchema = new mongoose.Schema({
     userId: {
-        type: ObjectId,
+        type: mongoose.Schema.Types.ObjectId,
         required: true
     }, 
     description: {

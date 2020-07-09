@@ -34,7 +34,7 @@ router.post('/exercise/new-user', (req, res, next) => {
  * Return the user object with the exercise fields added - 200   
  */
 router.post('/exercise/add', (req, res, next) => {
-    if (req.body.date === '') req.body.date = undefined;  
+    if (req.body.date === '' || null) req.body.date = undefined;  
     User.findById(req.body.userId, (err, user) => {
         if (err) return next(err);
         if (user) {
