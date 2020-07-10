@@ -3,14 +3,13 @@ const mongoose = require('mongoose');
 const UserSchema = new mongoose.Schema({  
     username: {
         type: String,
-        required: true,
         trim: true,
         unique: true 
     }, 
-    createdAt: {
-        type: Date, 
-        default: Date.now 
-    }
+    exercises: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Exercise'
+    }]
 }); 
 
 const User = mongoose.model('User', UserSchema);

@@ -9,7 +9,8 @@ const mongoose = require('mongoose');
 mongoose.connect(process.env.MLAB_URI || 
     `mongodb+srv://${process.env.MONGO_NAME}:${process.env.MONGO_KEY}@ks-ujl29.mongodb.net/exercise-tracker?retryWrites=true&w=majority`, {
         useNewUrlParser: true,
-        useUnifiedTopology: true
+        useUnifiedTopology: true,
+        useFindAndModify: false
 });
 
 const db = mongoose.connection;
