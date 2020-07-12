@@ -8,7 +8,7 @@ const { Exercise } = require('../models/exercise');
  * Return all users as objects with username and _id - 200
  */
 router.get('/exercise/users', (req, res, next) => {
-    User.find({}, (err, users) => {
+    User.find({}, '_id username', (err, users) => {
         if (err) return next(err);  
         res.json(users); 
     });
@@ -21,7 +21,10 @@ router.get('/exercise/users', (req, res, next) => {
 router.post('/exercise/new-user', (req, res, next) => {
     User.create({ username: req.body.username }, (err, user) => {
         if (err) return next(err);
-        res.json(user);
+        if (user) {
+            const { username, _id } = user;
+            res.json({ username, _id });
+        }
     });
 });
 
@@ -31,54 +34,49 @@ router.post('/exercise/new-user', (req, res, next) => {
  * Return the user object with the exercise fields added - 200   
  */
 router.post('/exercise/add', (req, res, next) => {
-    if (req.body.date === '' || null) req.body.date = new Date(); 
+    const { userId, description } = req.body; 
+    const duration = parseInt(req.body.duration); 
+    let date; 
+    req.body.date === '' || null ? 
+        date = new Date().toDateString() :
+        date = new Date(req.body.date).toDateString();
     const exercise = new Exercise(req.body);
     exercise.save(err => {
-        if (err) next(err); 
+        if (err) return next(err); 
     });
-    User
-        .findOneAndUpdate(
-            { _id: req.body.userId }, 
-            { $push: { exercises: exercise }}, 
-            { upsert: true }, err => {
-                if (err) next(err); 
-        })
-        .populate('exercises')
-        .exec((err, user) => {
-            if (err) next(err);
-            const exercise = user.exercises[user.exercises.length - 1] || user.exercises;  
-            res.json({
-                username: user.username,
-                description: exercise.description,
-                duration: exercise.duration,
-                _id: user._id,
-                date: exercise.date.toDateString()
-            });
-        });
+    User.findOneAndUpdate(
+        { _id: userId }, 
+        { $push: { exercises: exercise }}, 
+        { upsert: true }, (err, user) => {
+        if (err) return next(err); 
+        if (user) {
+            const { _id, username } = user;
+            res.json({ _id, username, date, duration, description });
+        }
+    });
 });
 
 /**
  * GET '/api/exercise/log/?user_id={user_id}&from={from}&to={to}&limit={limit}'
  * Return the user object with a full array of exercise log and total exercise count - 200 
  * Retrieve any part of the exercise log for any user - 200  
- * Date format yyyy-mm-dd, limit - int
  */
 router.get('/exercise/log', (req, res, next) => {
-    const { user_id, from, to, limit } = req.query; 
+    const { userId, from, to, limit } = req.query; 
     User
-        .findById(user_id, err => {
-            if (err) next(err);
+        .findById(userId, err => { 
+            if (err) return next(err); 
         })
-        .populate('exercises')
+        .populate({ path: 'exercises', select: '-_id -__v -userId' })
         .exec((err, user) => {
-            if (err) next(err);
-            const { username, exercises } = user;  
+            if (err) return next(err);
+            const { username, _id, exercises } = user;  
             let log = []; 
             if (from) {
                 log = exercises.filter(exercise => exercise.date >= new Date(from));
             }
             if (to) {
-                log = exercises.filter(exercise => exercise.date <= new Date(to)); // last day is not included!
+                log = exercises.filter(exercise => exercise.date <= new Date(to)); 
             }
             if (limit) {
                 log = exercises.slice(-limit); 
@@ -86,8 +84,8 @@ router.get('/exercise/log', (req, res, next) => {
             if (!from && !to && !limit) {
                 log = exercises;
             }
-            res.json({ username, log, count: log.length });
-        });                         
-});
+            res.json({ _id, username, count: log.length, log });
+    });                         
+});  
 
 module.exports = router; 

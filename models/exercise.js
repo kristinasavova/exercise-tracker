@@ -3,7 +3,8 @@ const mongoose = require('mongoose');
 const ExerciseSchema = new mongoose.Schema({
     userId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
+        ref: 'User',
+        required: true
     }, 
     description: {
         type: String,
@@ -15,7 +16,6 @@ const ExerciseSchema = new mongoose.Schema({
         max: 600
     },
     date: {
-        required: true,
         type: Date,
         default: Date.now   
     }
