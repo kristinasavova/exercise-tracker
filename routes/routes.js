@@ -36,7 +36,7 @@ router.post('/exercise/new-user', (req, res, next) => {
 router.post('/exercise/add', (req, res, next) => {
     const { userId, description } = req.body; 
     const duration = parseInt(req.body.duration); 
-    req.body.date === '' || null ? 
+    req.body.date === '' || req.body.date == null ? 
         req.body.date = new Date().toDateString() :
         req.body.date = new Date(req.body.date).toDateString();
     const exercise = new Exercise(req.body);
