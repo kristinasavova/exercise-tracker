@@ -12,6 +12,11 @@ const UserSchema = new mongoose.Schema({
     }]
 }); 
 
+UserSchema.pre('findOne', function() {
+    // `this` is an instance of mongoose.Query
+    this.populate({ path: 'exercises', select: '-_id -__v -userId' });
+  });
+
 const User = mongoose.model('User', UserSchema);
 
 module.exports.User = User; 

@@ -44,10 +44,8 @@ router.post('/exercise/add', (req, res, next) => {
     exercise.save(err => {
         if (err) return next(err); 
     });
-    User.findOneAndUpdate(
-        { _id: userId }, 
-        { $push: { exercises: exercise }}, 
-        { upsert: true }, (err, user) => {
+    User.findOneAndUpdate({ _id: userId }, { $push: { 
+        exercises: exercise }}, (err, user) => {
         if (err) return next(err); 
         if (user) {
             const { _id, username } = user;
@@ -62,21 +60,19 @@ router.post('/exercise/add', (req, res, next) => {
  * Retrieve any part of the exercise log for any user - 200  
  */
 router.get('/exercise/log', (req, res, next) => {
-    const { userId, from, to, limit } = req.query; 
-    User
-        .findById(userId, err => { 
-            if (err) return next(err); 
-        })
-        .populate({ path: 'exercises', select: '-_id -__v -userId' })
-        .exec((err, user) => {
-            if (err) return next(err);
+    const { userId, limit } = req.query;
+    const from = new Date(req.query.from);
+    const to = new Date(req.query.to); 
+    User.findById(userId, (err, user) => {
+        if (err) return next(err);
+        if (user) {
             const { username, _id, exercises } = user;  
             let log = []; 
             if (from) {
-                log = exercises.filter(exercise => exercise.date >= new Date(from));
+                log = exercises.filter(ex => new Date(ex.date.toDateString()) >= from);
             }
             if (to) {
-                log = exercises.filter(exercise => exercise.date <= new Date(to)); 
+                log = exercises.filter(ex => new Date(ex.date.toDateString()) <= to);
             }
             if (limit) {
                 log = exercises.slice(-limit); 
@@ -85,7 +81,8 @@ router.get('/exercise/log', (req, res, next) => {
                 log = exercises;
             }
             res.json({ _id, username, count: log.length, log });
-    });                         
-});  
+        }
+    });  
+});
 
 module.exports = router; 
