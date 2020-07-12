@@ -36,10 +36,9 @@ router.post('/exercise/new-user', (req, res, next) => {
 router.post('/exercise/add', (req, res, next) => {
     const { userId, description } = req.body; 
     const duration = parseInt(req.body.duration); 
-    let date; 
     req.body.date === '' || null ? 
-        date = new Date().toDateString() :
-        date = new Date(req.body.date).toDateString();
+        req.body.date = new Date().toDateString() :
+        req.body.date = new Date(req.body.date).toDateString();
     const exercise = new Exercise(req.body);
     exercise.save(err => {
         if (err) return next(err); 
@@ -49,6 +48,7 @@ router.post('/exercise/add', (req, res, next) => {
         if (err) return next(err); 
         if (user) {
             const { _id, username } = user;
+            const { date } = req.body;
             res.json({ _id, username, date, duration, description });
         }
     });
@@ -60,19 +60,17 @@ router.post('/exercise/add', (req, res, next) => {
  * Retrieve any part of the exercise log for any user - 200  
  */
 router.get('/exercise/log', (req, res, next) => {
-    const { userId, limit } = req.query;
-    const from = new Date(req.query.from);
-    const to = new Date(req.query.to); 
+    const { userId, from, to, limit } = req.query;
     User.findById(userId, (err, user) => {
         if (err) return next(err);
         if (user) {
             const { username, _id, exercises } = user;  
             let log = []; 
             if (from) {
-                log = exercises.filter(ex => new Date(ex.date.toDateString()) >= from);
+                log = exercises.filter(ex => ex.date >= new Date(from));
             }
             if (to) {
-                log = exercises.filter(ex => new Date(ex.date.toDateString()) <= to);
+                log = exercises.filter(ex => ex.date <= new Date(to));
             }
             if (limit) {
                 log = exercises.slice(-limit); 
