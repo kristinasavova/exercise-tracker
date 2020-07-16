@@ -1,7 +1,7 @@
 {
 	"name": "exercise-tracker",
 	"version": "0.1.0",
-	"description": "A REST API project, part of Free Code Camp's curriculum",
+	"description": "A REST API project, part of FCC's curriculum",
 	"main": "server.js",
 	"scripts": {
 		"start": "node server.js"
@@ -12,8 +12,8 @@
 	"license": "MIT",
 	"keywords": [
 		"node",
-		"gomix",
-		"express"
+		"express",
+		"mongoose"
 	],
 	"dependencies": {
 		"cors": "^2.8.5",

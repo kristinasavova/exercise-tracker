@@ -56,6 +56,7 @@ app.use((err, req, res, next) => {
     res.status(errCode).json({ error: errMessage });
 });
 
-const listener = app.listen(process.env.PORT || 3000, () => {
-  console.log('Express is listening on port ' + listener.address().port);
+app.set ('port', process.env.PORT || 3000);
+const server = app.listen (app.get ('port'), () => {
+    console.log (`Express is listening on port ${server.address ().port}`);
 });
