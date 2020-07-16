@@ -12,6 +12,9 @@ const UserSchema = new mongoose.Schema({
     }]
 }); 
 
+/**
+ * A method to populate 'exercises' path 
+ */
 UserSchema.pre('findOne', function() {
     // `this` is an instance of mongoose.Query
     this.populate({ path: 'exercises', select: '-_id -__v -userId' });

@@ -1,11 +1,23 @@
 # Exercise Tracker REST API
 
-#### A microservice project, part of Free Code Camp's curriculum
+The API provides a way for users to store and retrieve the information about their exercise routine.
+
+## Built with 
+
+- Node
+- Express
+- Mongoose 
+- MongoDB
+- Postman 
 
 ### User Stories
 
-1. I can create a user by posting form data username to /api/exercise/new-user and returned will be an object with username and _id.
-2. I can get an array of all users by getting api/exercise/users with the same info as when creating a user.
-3. I can add an exercise to any user by posting form data userId(_id), description, duration, and optionally date to /api/exercise/add. If no date supplied it will use current date. Returned will be the user object with also with the exercise fields added.
-4. I can retrieve a full exercise log of any user by getting /api/exercise/log with a parameter of userId(_id). Return will be the user object with added array log and count (total exercise count).
-5. I can retrieve part of the log of any user by also passing along optional parameters of from & to or limit. (Date format yyyy-mm-dd, limit = int)
+1. I can create a new user by posting form data username to `/api/exercise/new-user`. An object with a username and unique id will be returned.
+
+2. I can get an array of all users with their usernames and ids by getting `api/exercise/users`.
+
+3. I can add an exercise to any user by posting form data user id, description, duration and optionally date to `/api/exercise/add`. If date is not supplied, the current date will be used. The user object with the added exercise fields will be returned.
+
+4. I can retrieve a full exercise log of any user by getting `/api/exercise/log?userId=...` with a parameter of the unique user id. The user object with its exercise log and total exercise count will be returned.
+
+5. I can retrieve a part of the log of any user by adding optional parameters to the query string - `/api/exercise/log?userId=...&from=...&to=...&limit...`. From and to are dates formatted like YYYY-MM-DD, limit is the maximum number of exercises returned from the server. 
