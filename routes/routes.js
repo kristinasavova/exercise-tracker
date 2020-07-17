@@ -37,20 +37,20 @@ router.post('/exercise/add', (req, res, next) => {
     const { userId, description } = req.body; 
     const duration = parseInt(req.body.duration); 
     req.body.date === '' || req.body.date == null ? 
-        req.body.date = new Date().toDateString() :
-        req.body.date = new Date(req.body.date).toDateString();
+        req.body.date = new Date() :
+        req.body.date = new Date(req.body.date);
     const exercise = new Exercise(req.body);
     exercise.save(err => {
         if (err) return next(err); 
-    });
-    User.findOneAndUpdate({ _id: userId }, { $push: { 
-        exercises: exercise }}, (err, user) => {
-        if (err) return next(err); 
-        if (user) {
-            const { _id, username } = user;
-            const { date } = req.body;
-            res.json({ _id, username, date, duration, description });
-        }
+        User.findOneAndUpdate({ _id: userId }, { $push: { 
+            exercises: exercise }}, (err, user) => {
+            if (err) return next(err); 
+            if (user) {
+                const { _id, username } = user;
+                const date = req.body.date.toDateString();
+                res.json({ _id, username, date, duration, description });
+            }
+        });
     });
 });
 
@@ -60,25 +60,28 @@ router.post('/exercise/add', (req, res, next) => {
  * Retrieve any part of the exercise log for any user - 200  
  */
 router.get('/exercise/log', (req, res, next) => {
-    const { userId, from, to, limit } = req.query;
+    const { userId, limit } = req.query;
+    let { from, to } = req.query; 
+    from = new Date(from + 'T00:00:00Z').getTime();  // get 'from' UTC time in milliseconds
+    to = new Date(to + 'T23:59:59Z').getTime(); // get 'to' UTC time in milliseconds 
     User.findById(userId, (err, user) => {
         if (err) return next(err);
         if (user) {
             const { username, _id, exercises } = user;  
             let log = []; 
-            if (from) {
-                log = exercises.filter(ex => ex.date >= new Date(from));
-            }
-            if (to) {
-                log = exercises.filter(ex => ex.date <= new Date(to));
-            }
-            if (limit) {
-                log = exercises.slice(-limit); 
-            } 
-            if (!from && !to && !limit) {
+            if (to && from) {  // if both from and to are supplied  
+                log = exercises.filter(ex => ex.date.getTime() >= from && ex.date.getTime() <= to);
+            } else if (to) {  // if only to is supplied
+                log = exercises.filter(ex => ex.date.getTime() <= to);
+            } else if (from) {  // if only from is supplied
+                log = exercises.filter(ex => ex.date.getTime() >= from);
+            } else if (!from && !to) {  // if neither from nor to 
                 log = exercises;
             }
-            res.json({ _id, username, count: log.length, log });
+            if (limit) {  // if limit is supplied
+                log = log.slice(-limit); 
+            } 
+            res.json({ _id, username, count: log.length, log});
         }
     });  
 });
