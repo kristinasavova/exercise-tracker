@@ -3,10 +3,14 @@ const app = express();
 const routes = require('./routes/routes');
 const cors = require('cors');
 const mongoose = require('mongoose');
+const corsOptions = {
+    origin: 'https://exercise-tracker-rest-api.herokuapp.com/',
+    optionsSuccessStatus: 200
+};
 
 require('dotenv').config();
 
-app.use(cors());
+app.use(cors(corsOptions));
 
 mongoose.connect(process.env.MONGODB_URL, {
         useNewUrlParser: true,
