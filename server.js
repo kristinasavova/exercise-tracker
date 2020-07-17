@@ -6,8 +6,9 @@ const mongoose = require('mongoose');
 
 require('dotenv').config();
 
-mongoose.connect(process.env.MLAB_URI || 
-    `mongodb+srv://${process.env.MONGO_NAME}:${process.env.MONGO_KEY}@ks-ujl29.mongodb.net/exercise-tracker?retryWrites=true&w=majority`, {
+app.use(cors());
+
+mongoose.connect(process.env.MONGODB_URL, {
         useNewUrlParser: true,
         useUnifiedTopology: true,
         useFindAndModify: false,
@@ -18,8 +19,6 @@ const db = mongoose.connection;
 
 db.on('error', err => console.error(err));
 db.once('open', () => console.log('Database is connected'));
-
-app.use(cors());
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
