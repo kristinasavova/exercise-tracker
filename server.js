@@ -12,7 +12,7 @@ require('dotenv').config();
 
 app.use(cors(corsOptions));
 
-mongoose.connect(process.env.MONGODB_URL, {
+mongoose.connect(process.env.MONGODB_URI, {
         useNewUrlParser: true,
         useUnifiedTopology: true,
         useFindAndModify: false,
